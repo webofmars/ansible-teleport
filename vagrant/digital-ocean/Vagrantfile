@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.define "droplet" do |config|
+    config.vm.provider :digital_ocean do |provider, override|
+      override.ssh.private_key_path = '~/.ssh/id_rsa'
+      override.vm.box = 'digital_ocean'
+      override.vm.box_url = "https://github.com/devopsgroup-io/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      override.nfs.functional = false
+      override.vm.allowed_synced_folder_types = :rsync
+      provider.token = ENV["DIGITALOCEAN_TOKEN"]
+      provider.image = 'ubuntu-22-04-x64'
+      provider.region = 'ams3'
+      provider.size = 's-1vcpu-1gb'
+      provider.ssh_key_name = 'frederic@webofmars.com'
+      provider.backups_enabled = false
+      provider.private_networking = false
+      provider.ipv6 = false
+      provider.monitoring = false
+    end
+
+    config.vm.synced_folder "../../", "/code"
+
+    config.vm.provision "ansible_local" do |ansible|
+      ansible.install = true
+      ansible.install_mode = "pip"
+      ansible.playbook = "/code/tests/test.yml"
+      ansible.verbose = "vvv"
+      ansible.become = true
+      ansible.compatibility_mode = "2.0"
+      ansible.groups = {
+        "test" => ["droplet"],
+        "all" => ["droplet"],
+        }
+    end
+  end
+
+end
