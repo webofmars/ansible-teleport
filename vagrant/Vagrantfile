@@ -2,24 +2,25 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "debian/buster64"
-  config.vm.define "debian64" do |debian64| end
-
-# virtualbox provider only need a base virtualbox installation on
-# the local system. This is the default if no provider requested
-  config.vm.provider "virtualbox" do |v|
-      v.memory = 512
-      v.cpus = 1
+  config.vm.provider "docker" do |d|
+    d.build_dir = "."
+    d.has_ssh = true
+    d.remains_running = true
   end
 
-  config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "../tests/test.yml"
+  config.vm.synced_folder "../", "/code"
+  config.vm.define "docker"
+
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.install = true
+    ansible.install_mode = "pip"
+    ansible.playbook = "/code/tests/test.yml"
     ansible.verbose = "vvv"
     ansible.become = true
     ansible.compatibility_mode = "2.0"
-#    ansible.galaxy_role_file = "../requirements.yml"
+    # ansible.galaxy_role_file = "../requirements.yml"
     ansible.groups = {
-      "test" => ["debian64"],
+      "test" => ["docker", "localhost", "all"],
       }
   end
 
