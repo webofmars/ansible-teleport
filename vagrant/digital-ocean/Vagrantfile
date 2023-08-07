@@ -11,10 +11,10 @@ Vagrant.configure(2) do |config|
       override.nfs.functional = false
       override.vm.allowed_synced_folder_types = :rsync
       provider.token = ENV["DIGITALOCEAN_TOKEN"]
-      provider.image = 'ubuntu-22-04-x64'
-      provider.region = 'ams3'
-      provider.size = 's-1vcpu-1gb'
-      provider.ssh_key_name = 'frederic@webofmars.com'
+      provider.image = ENV["DIGITALOCEAN_IMAGE"]
+      provider.region = ENV["DIGITALOCEAN_REGION"]
+      provider.size = ENV["DIGITALOCEAN_SIZE"]
+      provider.ssh_key_name = ENV["DIGITALOCEAN_SSH_KEY_NAME"]
       provider.backups_enabled = false
       provider.private_networking = false
       provider.ipv6 = false
