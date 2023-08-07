@@ -31,11 +31,11 @@
 - hosts: test
   roles:
     - role: '../../.'
-#      teleport__version: 8.1.0
+      # teleport__version: 8.1.0
       teleport__agent: true
       teleport__nodename: "test.node"
       teleport__proxy: true
-      teleport__proxy_public_addr: "toto.tp.com:443"
+      teleport__proxy_public_addr: "toto.tp.com"
       teleport__proxy_acme: false
       teleport__proxy_acme_email: "test@toto.com"
       teleport__node: false

@@ -67,127 +67,50 @@ Usage
 
 Use Ansible galaxy requirements.yml
 
-    # teleport from enix
-    # private role
-    - src: git+ssh://git@gitlab.enix.io/ansible/ansible-teleport.git
-      name: enix.teleport
+```yaml
+# teleport from webofmars
+# private role
+- src: git://git@github.com:webofmars/ansible-teleport.git
+  name: webofmars.teleport
+```
 
 And add it to your play's roles:
 
 ```yaml
 # Node example
-    - hosts: all
-      roles:
-        - role enix.teleport:
-            teleport__agent: true
-            teleport__version: 9
-            teleport__nodename: "test.node"
-            teleport__node: true
-            teleport__node_token: "gjlksfdjglkfsdjlkgfds9423"
-            teleport__node_server: "https://toto.tp.com:3025"
-            teleport__ssh: true
-            teleport__ssh_labels:
-              tenant: toto.com
+- hosts: all
+  roles:
+    - role webofmars.teleport:
+        teleport__agent: true
+        teleport__version: 13
+        teleport__nodename: "test.node"
+        teleport__node: true
+        teleport__node_token: "gjlksfdjglkfsdjlkgfds9423"
+        teleport__node_server: "https://toto.tp.com:3025"
+        teleport__ssh: true
+        teleport__ssh_labels:
+          tenant: toto.com
 ```
 
 ```yaml
 # Proxy example
-    - hosts: all
-      roles:
-        - role enix.teleport:
-            teleport__agent: true
-            teleport__version: 10
-            teleport__nodename: "toto.proxy"
-            teleport__proxy: true
-            teleport__proxy_public_addr: "toto.tp.com"
-            teleport__proxy_acme: false
-            teleport__proxy_acme_email: "test@toto.com"
-            teleport__auth: true
-            teleport__auth_cluster_name: "toto.tp.com"
-            teleport__ssh: true
-            teleport__ssh_labels:
-              tenant: toto.com
+- hosts: all
+  roles:
+    - role webofmars.teleport:
+        teleport__agent: true
+        teleport__version: 13
+        teleport__nodename: "toto.proxy"
+        teleport__proxy: true
+        teleport__proxy_public_addr: "toto.tp.com"
+        teleport__proxy_acme: false
+        teleport__proxy_acme_email: "test@toto.com"
+        teleport__auth: true
+        teleport__auth_cluster_name: "toto.tp.com"
+        teleport__ssh: true
+        teleport__ssh_labels:
+          tenant: toto.com
 ```
 
+## License
 
-Changelog
----------
-
-### 1.8.0
-
-Make nodename optional (Teleport will default to the hostname)
-
-### 1.7.1
-
-Fix error message when target is not debian-like
-Use new package signature check method when applicable, and cleanup repository management
-
-### 1.7.0
-
-Add support for U2F old-style (non-webauthn) configuration
-
-### 1.6.1
-
-Fix duplicate diag config
-
-### 1.6.0
-
-Add support for diag HTTP endpoint
-
-### 1.5.2
-
-Fix YAML linting error
-
-### 1.5.1
-
-Cosmetic change in teleport.yaml template to avoid unnecessary diff
-
-### 1.5.0
-
-Support app service
-
-### 1.4.0
-
-Support LE certificates generated from outside teleport (ACME disabled)
-
-### 1.3.1
-
-Fix missing tailing slash on legacy debian repository
-
-### 1.3.0
-
-Add support for teleport upgrade using teleport (handler will wait for connection to be alive)
-
-Force removal of legacy apt repository
-
-Automatically upgrade teleport package if newer version available
-### 1.2.0
-
-Add proxy bindaddr support
-
-### 1.1.0
-
-Fallback to teleport debian repository with major versions.
-
-### 1.0.0
-
-Use Enix debian repo by default
-### 0.9.2
-
-Update compat binary to version 8.3.8
-### 0.9.1
-
-Add centos 6 binary compat (debian 8 jessie)
-### 0.9.0
-
-Initial version.
-
-License
--------
-
-GPLv2
-
-Author Information
-------------------
-
-Laurent Corbes <laurent.corbes@enix.fr> - http://www.enix.io
+- Apache2

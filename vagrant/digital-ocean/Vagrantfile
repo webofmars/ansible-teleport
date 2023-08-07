@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
       ansible.install = true
       ansible.install_mode = "pip"
       ansible.playbook = "/code/tests/test.yml"
-      ansible.verbose = "vvv"
+      ansible.verbose = ""
       ansible.become = true
       ansible.compatibility_mode = "2.0"
       ansible.groups = {
