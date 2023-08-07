@@ -25,6 +25,9 @@
   when: (ansible_distribution == "Debian" and ansible_distribution_major_version == "8") or
         (ansible_distribution == "Debian" and ansible_distribution_major_version == "7")
 
+- include_tasks: letsencrypt.yml
+  when: teleport__proxy_acme
+
 - include_tasks: install-packages.yml
   when: teleport__install_repo
 

@@ -1,0 +1,13 @@
+- name: Generate a new certificate
+  import_role:
+    name: systemli.letsencrypt
+  letsencrypt_cert:
+    account_email: "{{ teleport__proxy_acme_email }}"
+    name: "{{ teleport__proxy_public_addr }}"
+    domains:
+      - "{{ teleport__proxy_public_addr }}"
+    challenge: http
+    http_auth: webroot
+    webroot_path: /var/www/letsencrypt
+    services:
+      - apache2
