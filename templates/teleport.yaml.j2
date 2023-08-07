@@ -1,7 +1,6 @@
 {{ ansible_managed | comment }}
 ---
 
-version: v2
 teleport:
 {% if teleport__nodename is defined %}
   nodename: {{ teleport__nodename }}
