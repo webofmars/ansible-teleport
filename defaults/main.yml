@@ -1,4 +1,3 @@
----
 # defaults file for teleport
 
 teleport__version: 13
@@ -24,6 +23,8 @@ teleport__ssh_addr: "{{ teleport__bind_addr }}"
 teleport__ssh_port: 3022
 teleport__app: false
 teleport__applications: []
+teleport__db: false
+teleport__databases: []
 teleport__web_addr: "{{ teleport__bind_addr }}"
 teleport__web_port: 443
 teleport__tunnel_addr: "{{ teleport__bind_addr }}"

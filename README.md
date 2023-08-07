@@ -1,10 +1,8 @@
-enix.teleport
-=============
+# webofmars/teleport
 
 A role for deploying and configuring [teleport](https://goteleport.com) and extensions on unix hosts using [Ansible](http://www.ansible.com/).
 
-Requirements
-------------
+## Requirements
 
 Supported targets:
 
@@ -17,8 +15,7 @@ Supported targets:
 - Debian 10 "Buster"
 - Debian 11 "Bullseye"
 
-Role Variables
---------------
+## Role Variables
 
 This roles comes preloaded with almost every available default. You can override each one in your hosts/group vars, in your inventory, or in your play. See the annotated defaults in `defaults/main.yml` for help in configuration. All provided variables start with `teleport__`.
 
@@ -50,6 +47,12 @@ This roles comes preloaded with almost every available default. You can override
   - `name` - Name of the application
   - `uri` - URI to reverse-proxify
   - `skip_verify: false` - Whether or not to skip certificate verification on the target URI
+- `teleport__db: false` - Enable teleport db module
+- `teleport_databases: []` - List of databases, defined as a dict with the following keys:
+  - `name` - Name of the database instance in teleport
+  - `protocol` - Name of the protocol (like mysql / postgresql)
+  - `uri` - URI of the database from the node (have to match the certificate)
+  - `static_labels` - List of labels to be applied to the database
 - `teleport__web_addr: {{ teleport__bind_addr }}` - Bind address for web teleport service
 - `teleport__web_port: 443` - Port to bind for web teleport service
 - `teleport__tunnel_addr: {{ teleport__bind_addr }}` - Bind address for tunnel service
@@ -113,4 +116,4 @@ And add it to your play's roles:
 
 ## License
 
-- Apache2
+- MIT

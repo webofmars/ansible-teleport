@@ -97,3 +97,18 @@ app_service:
 {% endif %}
 {% endfor %}
 {%endif%}
+
+{% if teleport__db %}
+db_service:
+  enabled: yes
+  databases:
+  {% for db in teleport_databases %}
+  - name: "{{ db.name }}"
+    protocol: {{ db.protocol }}
+    uri: "{{ db.uri }}"
+    static_labels:
+    {% for label_id, value in db.static_labels.items() %}
+      {{ label_id }}: {{ value }}
+    {% endfor %}
+  {% endfor %}
+{%endif%}
