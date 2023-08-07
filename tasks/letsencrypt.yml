@@ -1,13 +1,21 @@
+---
+- name: Install apache2
+  apt:
+    package: apache2
+    update_cache: yes
+    state: present
+
 - name: Generate a new certificate
-  import_role:
-    name: systemli.letsencrypt
-  letsencrypt_cert:
-    account_email: "{{ teleport__proxy_acme_email }}"
-    name: "{{ teleport__proxy_public_addr }}"
-    domains:
-      - "{{ teleport__proxy_public_addr }}"
-    challenge: http
-    http_auth: webroot
-    webroot_path: /var/www/letsencrypt
-    services:
-      - apache2
+  include_role:
+    name: letsencrypt
+  vars:
+    letsencrypt_account_email: "{{ teleport__proxy_acme_email }}"
+    letsencrypt_http_auth: apache
+    letsencrypt_webroot_path: /var/www/html
+    letsencrypt_cert:
+      name: "{{ teleport__proxy_public_addr }}"
+      domains:
+        - "{{ teleport__proxy_public_addr }}"
+      challenge: http
+      services:
+        - apache2

@@ -34,3 +34,4 @@ teleport__binary_compat: false
 
 # on some distro repository is not supported
 teleport__install_repo: true
+
