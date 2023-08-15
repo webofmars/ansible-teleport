@@ -1,10 +1,10 @@
 galaxy_info:
   role_name: teleport
-  author: Laurent Corbes
-  description: Ansible role to deploy teleport software
-  company: Enix (http://www.enix.io)
+  author: Frederic Leger
+  description: Ansible role to deploy teleport
+  company: webofmars (https://webofmars.com)
 
-  license: license GPLv2
+  license: license GPLv3
 
   min_ansible_version: "2.9"
 
@@ -16,10 +16,6 @@ galaxy_info:
     - jammy
   - name: Debian
     versions:
-    - wheezy
-    - jessie
-    - stretch
-    - buster
     - bullseye
 
   galaxy_tags:
@@ -27,4 +23,7 @@ galaxy_info:
     - bastion
     - ssh
 
-dependencies: []
+dependencies:
+- name: letsencrypt
+  src: systemli.letsencrypt
+  version: 2.3.0

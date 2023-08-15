@@ -1,10 +1,10 @@
 {{ ansible_managed | comment }}
 ---
-
+version: v3
 teleport:
 {% if teleport__nodename is defined %}
   nodename: {{ teleport__nodename }}
-{% endif %}
+{% endif -%}
 
 {% if teleport__proxy %}
   data_dir: /var/lib/teleport
@@ -14,19 +14,22 @@ teleport:
     format:
       output: text
   ca_pin: []
-{%endif%}
+{% endif -%}
 
 {% if teleport__node %}
-## remote proxy
-  auth_token: "{{ teleport__node_token }}"
-  auth_servers:
-  - "{{ teleport__node_server }}"
-{%endif%}
+{% if teleport__app %}
+  proxy_server: "{{ teleport__node_server }}"
+{% else %}
+  auth_server: "{{ teleport__node_server }}"
+{% endif %}
+  join_params:
+    method: token
+    token_name: "{{ teleport__node_token }}"
+{% endif -%}
 
-{%- if teleport__diag %}
-
+{% if teleport__diag %}
   diag_addr: "{{ teleport__diag_addr}}:{{ teleport__diag_port}}"
-{%endif%}
+{% endif -%}
 
 auth_service:
 {% if teleport__auth %}
@@ -42,9 +45,9 @@ auth_service:
   listen_addr: {{ teleport__auth_addr }}:{{ teleport__auth_port }}
   cluster_name: {{ teleport__auth_cluster_name }}
   proxy_listener_mode: multiplex
-{%else%}
+{% else %}
   enabled: "false"
-{%endif%}
+{% endif -%}
 
 ssh_service:
 {% if teleport__ssh %}
@@ -60,9 +63,9 @@ ssh_service:
   - name: hostname
     command: [hostname]
     period: 1m0s
-{%else%}
+{% else %}
   enabled: "false"
-{%endif%}
+{% endif -%}
 
 proxy_service:
 {% if teleport__proxy %}
@@ -81,9 +84,9 @@ proxy_service:
     cert_file: /etc/letsencrypt/live/{{ teleport__proxy_public_addr }}/fullchain.pem
   acme: {}
 {% endif %}
-{%else%}
+{% else %}
   enabled: "false"
-{%endif%}
+{% endif -%}
 
 {% if teleport__app %}
 app_service:
@@ -96,7 +99,7 @@ app_service:
     insecure_skip_verify: true
 {% endif %}
 {% endfor %}
-{%endif%}
+{% endif -%}
 
 {% if teleport__db %}
 db_service:
@@ -111,4 +114,4 @@ db_service:
       {{ label_id }}: {{ value }}
     {% endfor %}
   {% endfor %}
-{%endif%}
+{% endif %}

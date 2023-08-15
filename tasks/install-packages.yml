@@ -50,12 +50,6 @@
     state: absent
     update_cache: yes
 
-- name: Remove Enix.io debian repository
-  apt_repository:
-    repo: "{{ teleport__enix_apt_repo }}"
-    state: absent
-    update_cache: yes
-
 - name: UnHold teleport package version
   dpkg_selections:
     name: teleport
