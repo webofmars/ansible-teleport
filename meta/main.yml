@@ -22,8 +22,3 @@ galaxy_info:
     - teleport
     - bastion
     - ssh
-
-dependencies:
-- name: letsencrypt
-  src: systemli.letsencrypt
-  version: 2.3.0

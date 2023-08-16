@@ -1,4 +1,0 @@
----
-- name: letsencrypt
-  src: systemli.letsencrypt
-  version: 2.3.0
