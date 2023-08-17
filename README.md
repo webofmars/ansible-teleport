@@ -6,14 +6,9 @@ A role for deploying and configuring [teleport](https://goteleport.com) and exte
 
 Supported targets:
 
-- Ubuntu 18.04 "Bionic"
-- Ubuntu 20.04 "Focal"
 - Ubuntu 22.04 "Jammy"
-- Debian 7 "Wheezy"
-- Debian 8 "Jessie"
-- Debian 9 "Stretch"
-- Debian 10 "Buster"
 - Debian 11 "Bullseye"
+- Debian 12 "Bookworm"
 
 ## Role Variables
 
@@ -60,13 +55,11 @@ This roles comes preloaded with almost every available default. You can override
 - `teleport__binary_compat: false` - If true will deploy a binary version beside the package with more glibc compatibility. (Automatically done on debian pre buster (10) releases)
 - `teleport__install_repo: true` - Set to false if you want to prevent repo installation (usefull for airgap environnement - install manually then use this role to configure everything)
 
-Dependencies
-------------
+## Dependencies
 
 - None
 
-Usage
------
+## Usage
 
 Use Ansible galaxy requirements.yml
 
@@ -89,7 +82,7 @@ And add it to your play's roles:
         teleport__nodename: "test.node"
         teleport__node: true
         teleport__node_token: "gjlksfdjglkfsdjlkgfds9423"
-        teleport__node_server: "https://toto.tp.com:3025"
+        teleport__node_server: "https://teleport.example.com:3025"
         teleport__ssh: true
         teleport__ssh_labels:
           tenant: toto.com
@@ -102,16 +95,131 @@ And add it to your play's roles:
     - role webofmars.teleport:
         teleport__agent: true
         teleport__version: 13
-        teleport__nodename: "toto.proxy"
+        teleport__nodename: "teleport.proxy"
         teleport__proxy: true
-        teleport__proxy_public_addr: "toto.tp.com"
+        teleport__proxy_public_addr: "teleport.example.com"
         teleport__proxy_acme: false
-        teleport__proxy_acme_email: "test@toto.com"
+        teleport__proxy_acme_email: "contact@example.com"
         teleport__auth: true
-        teleport__auth_cluster_name: "toto.tp.com"
+        teleport__auth_cluster_name: "teleport.example.com"
         teleport__ssh: true
         teleport__ssh_labels:
-          tenant: toto.com
+          tenant: exampledotcom
+```
+
+```yaml
+# Full example
+---
+
+# use certbot + apache to generate teleport server cert
+- hosts: teleport_servers
+  tags: teleport_servers_certs
+  pre_tasks:
+    - name: Install apache2
+      apt:
+        name: apache2
+        state: present
+    - name: Start apache2 (once)
+      service:
+        name: apache2
+        state: started
+        enabled: no
+  roles:
+    - role: systemli.letsencrypt
+      vars:
+        letsencrypt_account_email: "contact+exampledotcom@example.com"
+        letsencrypt_http_auth: apache
+        letsencrypt_webroot_path: /var/www/html
+        letsencrypt_cert:
+          name: "teleport.example.com"
+          domains:
+            - "teleport.example.com"
+            - "nginx.teleport.example.com"
+          challenge: http
+          services:
+            - apache2
+  tasks:
+    - name: Stop apache2
+      service:
+        name: apache2
+        state: stopped
+        enabled: no
+
+# install teleport server
+- hosts: teleport_servers
+  tags: teleport_servers_teleport
+  roles:
+    - role: webofmars.teleport
+      teleport__agent: true
+      teleport__nodename: "teleport.example.com"
+      teleport__proxy: true
+      teleport__proxy_public_addr: "teleport.example.com"
+      teleport__proxy_acme: true
+      teleport__proxy_acme_email: "contact@example.com"
+      teleport__node: false
+      teleport__auth: true
+      teleport__auth_cluster_name: "teleport.example.com"
+      teleport__ssh: true
+      teleport__ssh_labels:
+        tenant: exampledotcom
+        role: teleport
+
+- hosts: demo_nodes
+  tags: demo_nodes
+  tasks:
+  - name: install fake apps
+    apt:
+      name: "{{ item }}"
+      state: present
+    with_items:
+    - nginx
+    - mariadb-server
+    - mongodb-org # need to follow https://www.fosslinux.com/65442/how-to-install-mongodb-on-debian-11.htm before
+
+- hosts: teleport_nodes
+  tags: teleport_nodes
+  roles:
+    - role: webofmars.teleport
+      teleport__agent: true
+      teleport__nodename: "{{ inventory_hostname }}"
+      teleport__node: true
+      teleport__node_token: "{{ teleport_node_token }}"
+      teleport__node_server: "teleport.example.com:443"
+      teleport__ssh: true
+      teleport__ssh_labels:
+        tenant: exampledotcom
+        role: node
+        teleport_roles: "ssh,mariadb,mongodb,web"
+      teleport__app: true
+      teleport_applications:
+        - name: nginx
+          protocol: tcp
+          uri: "http://localhost"
+          labels:
+            tenant: exampledotcom
+            role: web
+      teleport__db: true
+      teleport_databases:
+        - name: demo-mariadb
+          protocol: mysql
+          uri: "127.0.0.1:3306"
+          static_labels:
+            tenant: exampledotcom
+            role: mariadb
+          dynamic_labels:
+            - name: "hostname"
+              command: ["hostname"]
+              period: 1m0s
+        - name: demo-mongodb
+          protocol: mongodb
+          uri: "mongodb://127.0.0.1:27017"
+          static_labels:
+            tenant: exampledotcom
+            role: mongodb
+          dynamic_labels:
+            - name: "hostname"
+              command: ["hostname"]
+              period: 1m0s
 ```
 
 ## License
