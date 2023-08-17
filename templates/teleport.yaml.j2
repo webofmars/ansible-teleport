@@ -25,11 +25,10 @@ teleport:
   join_params:
     method: token
     token_name: "{{ teleport__node_token }}"
-{% endif -%}
-
+{% endif %}
 {% if teleport__diag %}
   diag_addr: "{{ teleport__diag_addr}}:{{ teleport__diag_port}}"
-{% endif -%}
+{% endif %}
 
 auth_service:
 {% if teleport__auth %}
@@ -47,7 +46,7 @@ auth_service:
   proxy_listener_mode: multiplex
 {% else %}
   enabled: "false"
-{% endif -%}
+{% endif %}
 
 ssh_service:
 {% if teleport__ssh %}
@@ -65,7 +64,7 @@ ssh_service:
     period: 1m0s
 {% else %}
   enabled: "false"
-{% endif -%}
+{% endif %}
 
 proxy_service:
 {% if teleport__proxy %}
@@ -86,7 +85,7 @@ proxy_service:
 {% endif %}
 {% else %}
   enabled: "false"
-{% endif -%}
+{% endif %}
 
 {% if teleport__app %}
 app_service:
@@ -98,20 +97,26 @@ app_service:
 {% if app.skip_verify | default(false) %}
     insecure_skip_verify: true
 {% endif %}
+    labels:
+{% for label_id, value in app.labels.items() %}
+      {{ label_id }}: {{ value }}
 {% endfor %}
-{% endif -%}
+{% endfor -%}
+{% endif %}
 
 {% if teleport__db %}
 db_service:
   enabled: yes
   databases:
-  {% for db in teleport_databases %}
+{% for db in teleport_databases %}
   - name: "{{ db.name }}"
     protocol: {{ db.protocol }}
     uri: "{{ db.uri }}"
     static_labels:
-    {% for label_id, value in db.static_labels.items() %}
+{% for label_id, value in db.static_labels.items() %}
       {{ label_id }}: {{ value }}
-    {% endfor %}
-  {% endfor %}
+{% endfor %}
+    dynamic_labels:
+      {{ db.dynamic_labels | to_yaml | indent(6) -}}
+{% endfor -%}
 {% endif %}
